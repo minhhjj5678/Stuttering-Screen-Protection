@@ -2,24 +2,25 @@ package com.example.lagprotection;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.server.ServerLifecycleEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Mod.EventBusSubscriber(modid = "lagprotection")
+@EventBusSubscriber(modid = "lagprotection")
 public class ServerProtectionState {
 
     private static final Set<UUID> protectedPlayers = new HashSet<>();
     private static final Map<UUID, Long> lastPingTime = new ConcurrentHashMap<>();
     private static MinecraftServer serverInstance = null;
 
-    private static final long TIMEOUT_MS = 300; // sau 0.25s không nhận ping thì xem là lag
+    private static final long TIMEOUT_MS = 300;
 
-    // Được gọi khi nhận packet từ client (LagStatusPacket)
     public static void onPingReceived(ServerPlayer player) {
         lastPingTime.put(player.getUUID(), System.currentTimeMillis());
     }
@@ -38,14 +39,14 @@ public class ServerProtectionState {
     }
 
     @SubscribeEvent
-    public static void onServerStarted(ServerStartedEvent event) {
-        serverInstance = event.getServer();
-    }
+	public static void onServerStarted(ServerStartedEvent event) {
+		serverInstance = event.getServer();
+	}
 
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || serverInstance == null) return;
+    public static void onServerTick(ServerTickEvent.Post event) {
+        if (serverInstance == null) return;
 
         long now = System.currentTimeMillis();
 

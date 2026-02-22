@@ -2,136 +2,131 @@ package com.example.lagprotection.client;
 
 import com.example.lagprotection.config.LagConfig;
 import com.example.lagprotection.network.LagStatusPacket;
-import com.example.lagprotection.network.PacketHandle;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent.RenderTickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
 
-import java.util.Queue;
 import java.util.ArrayDeque;
+import java.util.Queue;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
+@EventBusSubscriber(modid = "lagprotection", value = Dist.CLIENT)
 public class FpsChecker {
-    private static final int FPS_THRESGOLD = 18;
     private static boolean isProtecting = false;
     private static long gracePeriodEnd = 0;
-    
+	private static long debug = 0;
+
+    private static int graceTimeMs;
+	private static int stutteringLevel = 1;
+	private static int additionalLevel = 0;
+	private static final int FPS_THRESHOLD = 18;
+	private static final int MULTIPLIER = 8; // 1 sec = 8 level
+
     private static final Queue<Integer> fpsHistory = new ArrayDeque<>();
-    private static final int HISTORY_MAX_SIZE = 40;
-    private static int fpsAverage;
-
-    private static long lastRenderTime = 0;
-    private static long lastLogicTime = 0;
-
-    private static final int SCALE = 4;
-
-    private static final int MULTIPLIER = 8; // 1 second ~ 8 level
-    private static int stutteringLevel = 1;
-    private static int graceTime = 0;
-
-    public static boolean isCurrentlyProtected() {
-        return isProtecting;
-    }
-
+    private static final int HISTORY_SIZE = 40;
+    private static int averageFps = 0;
+	
+	private static long lastRenderTime = 0;
+	private static long lastLogicTime = 0;
 
     @SubscribeEvent
-    public static void onRenderTick(RenderTickEvent event) {
-        long now = System.currentTimeMillis();
-        long nanoNow = System.nanoTime();
-        if (event.phase != RenderTickEvent.Phase.END) return;
-        if (lastRenderTime == 0) {
-            lastRenderTime = nanoNow;
-            return;
-        }
-        long frameTime = nanoNow - lastRenderTime;
-        lastRenderTime = nanoNow;
-
-        if (now - lastLogicTime < 100) return;
-        lastLogicTime = now;
-        if (frameTime == 0) return;
-        int instantFps = (int) (1_000_000_000L / frameTime);
-        long frameTimeMs = frameTime / 1_000_000;
-
+    public static void onRenderFrame(RenderFrameEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
+		
+		long nanoNow = System.nanoTime();
+		if(lastRenderTime == 0) {
+			lastRenderTime = nanoNow;
+			return;
+		}
+		
+		long nanoTimeFrame = nanoNow - lastRenderTime;
+		lastRenderTime = nanoNow;
+		if (nanoTimeFrame == 0) return;
+		int instantFps = (int) (1_000_000_000L/nanoTimeFrame);
+		long timeFrameMs = nanoTimeFrame/1_000_000;
+		
+		long now = System.currentTimeMillis();
+		if (now - lastLogicTime < 100) return;
+		lastLogicTime = now;
 
-        int mcFps = mc.getFps();
-        int fps = instantFps;
-        int maxFps = mc.options.framerateLimit().get();
+        int currentFps = instantFps;
+		int maxFpsSetting = mc.options.framerateLimit().get();
+		if (maxFpsSetting < 260 && currentFps >= (maxFpsSetting-3)) {
+			fpsHistory.clear();
+			for(int i = 0; i < HISTORY_SIZE; i++) fpsHistory.add(currentFps);
+			averageFps = currentFps;
+		} else updateFpsHistory(currentFps);
+        boolean isLaggingNow1, isLaggingNow2;
+        boolean isLowFps = currentFps <= FPS_THRESHOLD;
 
-        boolean isLowFps = fps <= FPS_THRESGOLD;
-        boolean isInstantDrop, isLagging1;
-        if (maxFps < 260 && fps >= (maxFps - SCALE)) {
-            fpsHistory.clear();
-            for (int i = 0; i<HISTORY_MAX_SIZE; i++) fpsHistory.add(fps);
-            fpsAverage = fps;
-        } else updateFpsHistory(fps);
-        
         if (fpsHistory.size() < 20) {
-            isLagging1 = isLowFps;
+            isLaggingNow1 = isLowFps;
         } else {
-            isInstantDrop = fps <= (fpsAverage * 0.8);
-            isLagging1 = isLowFps && isInstantDrop;
+            boolean isSuddenDrop = currentFps <= (averageFps * 0.8);
+            isLaggingNow1 = isLowFps && isSuddenDrop;
         }
+		
+		isLaggingNow2 = maxFpsSetting > 20 && currentFps <= 10;
 
-        boolean isLagging2 = (fps<10 && maxFps>20);
-        boolean isLaggingNow = isLagging1 || isLagging2;
-        int additionalLevel = 0;
+        now = System.currentTimeMillis();
 
-        int graceTimeTmp = 0;
-        if (isLaggingNow) {
-            if (!isProtecting) {
-                isProtecting = true;
-            }
-            if (stutteringLevel < 80) stutteringLevel += 1;
-            additionalLevel = (int) (frameTimeMs * MULTIPLIER / 1000);
-            additionalLevel = (additionalLevel > 100) ? 100 : (additionalLevel < 0) ? 0 : additionalLevel;
-            gracePeriodEnd = 0; // reset
-        } else stutteringLevel -= 1;
+        if (isLaggingNow1 || isLaggingNow2) {
+            if (!isProtecting) isProtecting = true;
 
-        stutteringLevel = (stutteringLevel < 0) ? 0 : stutteringLevel;
-        stutteringLevel += additionalLevel;
-        stutteringLevel = (stutteringLevel > 100) ? 100 : (stutteringLevel < 0) ? 0 : stutteringLevel;
+			if (stutteringLevel < 80) stutteringLevel++;
+		    additionalLevel = (int) (timeFrameMs*MULTIPLIER/1000);
+		    stutteringLevel += (additionalLevel>20) ? 20 : additionalLevel;
+            gracePeriodEnd = 0;
+        } else if (stutteringLevel > 0) stutteringLevel--;
 
-        if (!isLaggingNow && isProtecting) {
+        if (!isLaggingNow1 && !isLaggingNow2 && isProtecting) {
             if (gracePeriodEnd == 0) {
-                if (stutteringLevel < 1) graceTimeTmp = 0;
-                else if (stutteringLevel < 31) graceTimeTmp = 250;
-                else if (stutteringLevel < 41) graceTimeTmp = 1000;
-                else if (stutteringLevel < 61) graceTimeTmp = 2000;
-                else if (stutteringLevel < 81) graceTimeTmp = 3000;
-                else graceTimeTmp = 3500;
-
-                if (graceTimeTmp > graceTime) {
-                    graceTime = graceTimeTmp;
-                    gracePeriodEnd = now + graceTimeTmp;
-                } else gracePeriodEnd = now + graceTime;
+            	int graceTimeMsTmp = 0;
+				if (stutteringLevel < 1) graceTimeMs = 0;
+				else if (stutteringLevel < 31) graceTimeMsTmp = 250;
+				else if (stutteringLevel < 41) graceTimeMsTmp = 1000;
+				else if (stutteringLevel < 61) graceTimeMsTmp = 2000;
+				else if (stutteringLevel < 81) graceTimeMsTmp = 3000;
+				else graceTimeMsTmp = 3500;
+				if (graceTimeMsTmp > graceTimeMs) {
+                    graceTimeMs = graceTimeMsTmp;
+                    gracePeriodEnd = now + graceTimeMsTmp;
+                } else gracePeriodEnd = now + graceTimeMs;
             }
 
             if (now >= gracePeriodEnd) {
                 isProtecting = false;
-                if (mc.getConnection() != null) PacketHandle.INSTANCE.sendToServer(new LagStatusPacket());
-                gracePeriodEnd = 0; // reset
-                graceTime = 0;
+                sendPacket(mc);
+                gracePeriodEnd = 0;
+                graceTimeMs = 0;
             }
         }
 
-        if (!isLaggingNow && !isProtecting) {
-            if (mc.getConnection() != null) PacketHandle.INSTANCE.sendToServer(new LagStatusPacket());
+        if (!isLaggingNow1 && !isLaggingNow2 && !isProtecting) {
+            sendPacket(mc);
         }
-        long debug = (gracePeriodEnd - now > 0) ? (gracePeriodEnd - now) : 0;
-        ClientHudRenderer.updateLagStatus(isProtecting, fps, mcFps, fpsAverage, stutteringLevel, debug);
+
+        debug = gracePeriodEnd - now;
+        ClientHudRenderer.updateLagStatus(isProtecting, currentFps, averageFps, stutteringLevel, debug, mc.getFps());
     }
 
-    private static void updateFpsHistory(int fps) {
-        fpsHistory.add(fps);
-        if(fpsHistory.size() > HISTORY_MAX_SIZE) fpsHistory.remove();
-        if(fpsHistory.isEmpty()) return;
-        int size = fpsHistory.size();
+    private static void updateFpsHistory(int currentFps) {
+        fpsHistory.add(currentFps);
+        if (fpsHistory.size() > HISTORY_SIZE) {
+            fpsHistory.remove();
+        }
+
+        if (fpsHistory.isEmpty()) return;
         long sum = 0;
-        for(int f : fpsHistory) sum += f;
-        fpsAverage = (int) (sum/size);
+        for (int f : fpsHistory) sum += f;
+        averageFps = (int) (sum / fpsHistory.size());
+    }
+
+    private static void sendPacket(Minecraft mc) {
+        if (mc.getConnection() != null) {
+            mc.getConnection().send(LagStatusPacket.PACKET);
+        }
     }
 }

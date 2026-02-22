@@ -1,68 +1,58 @@
 package com.example.lagprotection.client;
 
+import com.example.lagprotection.config.LagConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import com.example.lagprotection.config.LagConfig;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
+import java.awt.Color;
 
-import java.awt.*;
-
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ClientHudRenderer {
-    private static boolean isLagging = false;
-    private static int currentFps = 0;
-    private static int mcFps = 0;
-    private static int avgFps = 0;
-    private static int lvl = 1;
-    private static long debug;
+    public static boolean isLagging = false;
+    public static int currentFps = 0;
+    public static int averageFps = 0;
+	public static int stutteringLevel = 1;
+	public static long debug;
+	public static int mcFps;
 
-    public static void updateLagStatus(boolean isLagging, int currentFps, int mcFps, int avgFps, int lvl, long debug) {
-        ClientHudRenderer.isLagging = isLagging;
-        ClientHudRenderer.currentFps = currentFps;
-        ClientHudRenderer.mcFps = mcFps;
-        ClientHudRenderer.avgFps = avgFps;
-        ClientHudRenderer.lvl = lvl;
-        ClientHudRenderer.debug = debug;
+    public static void updateLagStatus(boolean lag, int fps, int avg, int lvl, long debugTime, int minecraftFps) {
+        isLagging = lag;
+        currentFps = fps;
+		averageFps = avg;
+		stutteringLevel = lvl;
+		debug = debugTime;
+		mcFps = minecraftFps;
     }
 
-    @SubscribeEvent
-    public static void onRenderOverlay(RenderGuiOverlayEvent.Post event) {
+    public static void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.level == null) return;
-        if (mc.screen instanceof ChatScreen) return;
-        if (mc.options.hideGui) return;
+
         if (!LagConfig.SHOW_HUD.get()) return;
-        if (event.getOverlay() != VanillaGuiOverlay.HOTBAR.type()) return;
-
-        GuiGraphics guiGraphics = event.getGuiGraphics();
-        String text = "FPS: " + mcFps;
+        if (mc.player == null || mc.level == null) return;
+        if (mc.options.hideGui) return;
+        if (mc.screen instanceof ChatScreen) return;
+        
+        String mcText = "FPS: " + mcFps;
         int color = isLagging ? Color.GREEN.getRGB() : Color.WHITE.getRGB();
-
-        int screenHeight = mc.getWindow().getGuiScaledHeight();
+        int screenHeight = guiGraphics.guiHeight();
         int x = 5;
         int y = screenHeight - 10;
 
         /*// i use this for debug only
-        String avgText = "Average FPS: " + avgFps;
+		String avgText = "Average FPS: " + averageFps;
         int avgX = 5;
         int avgY = screenHeight - 20;
-        String sttText = "Stuttering Level: " + lvl;
+		String sttText = "Stuttering Level: " + stutteringLevel;
         int sttX = 5;
         int sttY = screenHeight - 30;
-        
-        String dbText = "Time Left: " + debug;
+		String dbText = "Time Left: " + debug;
         int dbX = 5;
         int dbY = screenHeight - 40;
-        
+
         guiGraphics.drawString(mc.font, avgText, avgX, avgY, color);
         guiGraphics.drawString(mc.font, sttText, sttX, sttY, color);
         guiGraphics.drawString(mc.font, dbText, dbX, dbY, color);
-        */
-        guiGraphics.drawString(mc.font, text, x, y, color);
+		*/
+        guiGraphics.drawString(mc.font, mcText, x, y, color);
     }
 }

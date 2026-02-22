@@ -1,21 +1,22 @@
 package com.example.lagprotection;
 
-import com.example.lagprotection.network.PacketHandle;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraftforge.event.entity.living.*;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
-@Mod.EventBusSubscriber(modid = "lagprotection", bus = Mod.EventBusSubscriber.Bus.FORGE)
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+@EventBusSubscriber(modid = "lagprotection")
 public class ServerEvents {
+
+    private static final Set<ServerPlayer> healingQueue = ConcurrentHashMap.newKeySet();
 
     private static boolean isProtected(LivingEntity entity) {
         if (!(entity instanceof ServerPlayer player)) return false;
@@ -23,16 +24,10 @@ public class ServerEvents {
     }
 
     @SubscribeEvent
-    public static void onLivingHurt(LivingHurtEvent event) {
+    public static void onLivingIncomingDamageEvent(LivingIncomingDamageEvent event) {
         if (!isProtected(event.getEntity())) return;
 
-        String sourceId = event.getSource().getMsgId();
         LivingEntity entity = event.getEntity();
-
-        if ("drown".equals(sourceId) && entity instanceof Player player) {
-            player.setAirSupply(player.getMaxAirSupply());
-        }
-
         if (entity instanceof ServerPlayer serverPlayer) {
             serverPlayer.connection.send(new ClientboundSetHealthPacket(
                     serverPlayer.getHealth(),
@@ -41,28 +36,41 @@ public class ServerEvents {
             ));
             serverPlayer.hurtMarked = true;
         }
-
         event.setCanceled(true);
     }
 
     @SubscribeEvent
-    public static void onLivingAttack(LivingAttackEvent event) {
+    public static void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
         if (!isProtected(event.getEntity())) return;
-        event.setCanceled(true);
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+
+        event.setNewDamage(0.0F);
+        player.setAirSupply(player.getMaxAirSupply());
+        player.clearFire();
+        player.fallDistance = 0;
+        player.connection.send(new ClientboundSetHealthPacket(
+                player.getHealth(),
+                player.getFoodData().getFoodLevel(),
+                player.getFoodData().getSaturationLevel()
+        ));
     }
 
-    @SubscribeEvent
-    public static void onLivingDamage(LivingDamageEvent event) {
-        if (!isProtected(event.getEntity())) return;
 
-        LivingEntity entity = event.getEntity();
+    /*@SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Pre event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        if (!isProtected(player)) return;
 
-        if (entity instanceof Player player) {
-            player.clearFire();
-            // player.setDeltaMovement(0, 0, 0);
-            player.fallDistance = 0;
+        if (healingQueue.remove(player)) {
+            player.setHealth(player.getMaxHealth());
         }
-
-        event.setCanceled(true);
-    }
+        player.setAirSupply(player.getMaxAirSupply());
+        player.clearFire();
+        player.fallDistance = 0;
+        player.connection.send(new ClientboundSetHealthPacket(
+                player.getHealth(),
+                player.getFoodData().getFoodLevel(),
+                player.getFoodData().getSaturationLevel()
+        ));
+    }*/
 }

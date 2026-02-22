@@ -1,14 +1,14 @@
 package com.example.lagprotection.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class LagConfig {
-    public static final ForgeConfigSpec CLIENT_CONFIG;
-    public static final ForgeConfigSpec.BooleanValue SHOW_HUD;
+    public static final ModConfigSpec COMMON_CONFIG;
+    public static final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+    
+    public static final ModConfigSpec.BooleanValue SHOW_HUD;
 
     static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-
         builder.push("Lag Protection Settings");
 
         SHOW_HUD = builder
@@ -16,7 +16,6 @@ public class LagConfig {
                 .define("showHud", true);
 
         builder.pop();
-
-        CLIENT_CONFIG = builder.build();
+        COMMON_CONFIG = builder.build();
     }
 }

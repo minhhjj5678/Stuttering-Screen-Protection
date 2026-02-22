@@ -1,18 +1,19 @@
 package com.example.lagprotection.network;
 
-import com.example.lagprotection.LagProtectionMod;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import com.example.lagprotection.ServerProtectionState;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class PacketHandle {
-    private static final String PROTOCOL_VERSION = "1.0";
-    public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(LagProtectionMod.MODID, "main"),
-            () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals
-    );
-
-    public static void init() {
-        INSTANCE.registerMessage(0, LagStatusPacket.class, LagStatusPacket::encode, LagStatusPacket::decode, LagStatusPacket::handle);
+    public static void LagPacketHandleServerside(LagStatusPacket msg, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            Player player = context.player();
+            if (player instanceof ServerPlayer serverPlayer) {
+                ServerProtectionState.onPingReceived(serverPlayer);
+            }
+        });
     }
+
+    public static void LagPacketHandleClientside(LagStatusPacket msg, IPayloadContext context) {} //pass
 }

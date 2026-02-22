@@ -1,19 +1,15 @@
-package com.example.lagprotection.client;
+package com.example.lagprotection.config;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.client.Minecraft;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraft.network.chat.Component;
-import com.mojang.brigadier.arguments.BoolArgumentType;
-import net.minecraftforge.api.distmarker.Dist;
-import com.example.lagprotection.config.LagConfig;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = "lagprotection")
 public class ClientCommands {
 
     @SubscribeEvent
@@ -21,18 +17,16 @@ public class ClientCommands {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
         dispatcher.register(Commands.literal("lagprotection-hud")
-                .then(
-                    Commands.argument("trang_thai", BoolArgumentType.bool())
-                        .executes(ctx -> {
-                            if (Minecraft.getInstance().player == null) {
-                                return 0;
-                            }
-                            boolean showFps = BoolArgumentType.getBool(ctx, "trang_thai");
-                            LagConfig.SHOW_HUD.set(showFps);
-                            return 1;
-                        })
+            .then(Commands.argument("active", BoolArgumentType.bool())
+                .executes(ctx -> {
+                    boolean newValue = BoolArgumentType.getBool(ctx, "active");
+
+                    LagConfig.SHOW_HUD.set(newValue);
+                    LagConfig.COMMON_CONFIG.save();
                     
-                )
+                    return 1;
+                })
+            )
         );
     }
 }
