@@ -1,28 +1,33 @@
 package com.example.lagprotection;
 
-import com.example.lagprotection.client.ClientHudRenderer;
 import com.example.lagprotection.config.LagConfig;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import com.example.lagprotection.network.PacketHandle;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod("lagprotection")
 public class LagProtectionMod {
     public static final String MODID = "lagprotection";
 
-    public LagProtectionMod(ModContainer container) {
-        IEventBus modEventBus = container.getEventBus();
-        modEventBus.addListener(com.example.lagprotection.network.LagStatusPacket::register);
-        modEventBus.addListener(this::registerGuiLayers);
-        container.registerConfig(ModConfig.Type.COMMON, LagConfig.COMMON_CONFIG);
+    public LagProtectionMod() {
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onCommonSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, LagConfig.COMMON_CONFIG);
+        MinecraftForge.EVENT_BUS.register(this);
     }
-	
-    private void registerGuiLayers(RegisterGuiLayersEvent event) {
-        event.registerAboveAll(
-            net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(MODID, "fps_hud"), 
-            ClientHudRenderer::render 
-        );
+
+    private void onCommonSetup(FMLCommonSetupEvent event) {
+        PacketHandle.init();
+    }
+
+
+    private void onClientSetup(FMLClientSetupEvent event) {
+        com.example.lagprotection.client.FpsChecker.start();
     }
 }

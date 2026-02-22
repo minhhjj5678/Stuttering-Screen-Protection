@@ -1,22 +1,28 @@
 package com.example.lagprotection;
 
+import com.example.lagprotection.network.ClearEffectPacket;
+import com.example.lagprotection.network.PacketHandle;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ThrownPotion;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraftforge.event.entity.living.*;
+import net.minecraftforge.event.entity.living.MobEffectEvent.Added;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-@EventBusSubscriber(modid = "lagprotection")
+@Mod.EventBusSubscriber(modid = "lagprotection", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerEvents {
-
-    private static final Set<ServerPlayer> healingQueue = ConcurrentHashMap.newKeySet();
 
     private static boolean isProtected(LivingEntity entity) {
         if (!(entity instanceof ServerPlayer player)) return false;
@@ -24,10 +30,16 @@ public class ServerEvents {
     }
 
     @SubscribeEvent
-    public static void onLivingIncomingDamageEvent(LivingIncomingDamageEvent event) {
+    public static void onLivingHurt(LivingHurtEvent event) {
         if (!isProtected(event.getEntity())) return;
 
+        String sourceId = event.getSource().getMsgId();
         LivingEntity entity = event.getEntity();
+
+        if ("drown".equals(sourceId) && entity instanceof Player player) {
+            player.setAirSupply(player.getMaxAirSupply());
+        }
+
         if (entity instanceof ServerPlayer serverPlayer) {
             serverPlayer.connection.send(new ClientboundSetHealthPacket(
                     serverPlayer.getHealth(),
@@ -36,41 +48,51 @@ public class ServerEvents {
             ));
             serverPlayer.hurtMarked = true;
         }
+
         event.setCanceled(true);
     }
 
     @SubscribeEvent
-    public static void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
+    public static void onLivingAttack(LivingAttackEvent event) {
         if (!isProtected(event.getEntity())) return;
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-
-        event.setNewDamage(0.0F);
-        player.setAirSupply(player.getMaxAirSupply());
-        player.clearFire();
-        player.fallDistance = 0;
-        player.connection.send(new ClientboundSetHealthPacket(
-                player.getHealth(),
-                player.getFoodData().getFoodLevel(),
-                player.getFoodData().getSaturationLevel()
-        ));
+        event.setCanceled(true);
     }
 
+    @SubscribeEvent
+    public static void onLivingDamage(LivingDamageEvent event) {
+        if (!isProtected(event.getEntity())) return;
 
-    /*@SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent.Pre event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        if (!isProtected(player)) return;
+        LivingEntity entity = event.getEntity();
 
-        if (healingQueue.remove(player)) {
-            player.setHealth(player.getMaxHealth());
+        if (entity instanceof Player player) {
+            player.clearFire();
+            player.setDeltaMovement(0, 0, 0);
+            player.fallDistance = 0;
         }
-        player.setAirSupply(player.getMaxAirSupply());
-        player.clearFire();
-        player.fallDistance = 0;
-        player.connection.send(new ClientboundSetHealthPacket(
-                player.getHealth(),
-                player.getFoodData().getFoodLevel(),
-                player.getFoodData().getSaturationLevel()
-        ));
-    }*/
+
+        event.setCanceled(true);
+    }
+
+    //@SubscribeEvent
+    public static void onPotionApply(MobEffectEvent.Added event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        if (!ServerProtectionState.isProtected(player)) return;
+
+        if (event.getEffectSource() instanceof AreaEffectCloud || event.getEffectSource() instanceof ThrownPotion) return;
+
+        if (event.getEffectInstance().getEffect() == MobEffects.DARKNESS ||
+                event.getEffectInstance().getEffect() == MobEffects.DIG_SLOWDOWN) {
+            return;
+        }
+
+        if (event.getEffectSource() == null || event.getEffectSource() == event.getEntity()) return;
+
+        //player.removeEffect(event.getEffectInstance().getEffect());
+        /*if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            PacketHandle.INSTANCE.send(
+                    PacketDistributor.PLAYER.with(() -> serverPlayer),
+                    new ClearEffectPacket(event.getEffectInstance().getEffect())
+            );
+        }*/
+    }
 }
