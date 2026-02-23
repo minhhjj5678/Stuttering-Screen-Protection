@@ -1,7 +1,6 @@
-package com.example.lagprotection.client;
+package com.minhhjjj.stutterprotection.client;
 
-import com.example.lagprotection.config.LagConfig;
-import com.example.lagprotection.network.LagStatusPacket;
+import com.minhhjjj.stutterprotection.network.LagStatusPacket;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -11,7 +10,7 @@ import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-@EventBusSubscriber(modid = "lagprotection", value = Dist.CLIENT)
+@EventBusSubscriber(modid = "stutterprotection", value = Dist.CLIENT)
 public class FpsChecker {
     private static boolean isProtecting = false;
     private static long gracePeriodEnd = 0;
@@ -124,6 +123,7 @@ public class FpsChecker {
         averageFps = (int) (sum / fpsHistory.size());
     }
 
+    @SuppressWarnings("null")
     private static void sendPacket(Minecraft mc) {
         if (mc.getConnection() != null) {
             mc.getConnection().send(LagStatusPacket.PACKET);

@@ -1,4 +1,4 @@
-package com.example.lagprotection;
+package com.minhhjjj.stutterprotection;
 
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -7,16 +7,12 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-@EventBusSubscriber(modid = "lagprotection")
+@EventBusSubscriber(modid = StutterProtection.MODID)
 public class ServerEvents {
 
-    private static final Set<ServerPlayer> healingQueue = ConcurrentHashMap.newKeySet();
+    // private static final Set<ServerPlayer> healingQueue = ConcurrentHashMap.newKeySet();
 
     private static boolean isProtected(LivingEntity entity) {
         if (!(entity instanceof ServerPlayer player)) return false;

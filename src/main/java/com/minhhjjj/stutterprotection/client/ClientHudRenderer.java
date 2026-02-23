@@ -1,6 +1,6 @@
-package com.example.lagprotection.client;
+package com.minhhjjj.stutterprotection.client;
 
-import com.example.lagprotection.config.LagConfig;
+import com.minhhjjj.stutterprotection.config.LagConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.DeltaTracker;
@@ -24,6 +24,7 @@ public class ClientHudRenderer {
 		mcFps = minecraftFps;
     }
 
+    @SuppressWarnings("null")
     public static void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
 

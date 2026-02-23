@@ -1,18 +1,17 @@
-package com.example.lagprotection;
+package com.minhhjjj.stutterprotection;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.event.server.ServerLifecycleEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@EventBusSubscriber(modid = "lagprotection")
+@EventBusSubscriber(modid = StutterProtection.MODID)
 public class ServerProtectionState {
 
     private static final Set<UUID> protectedPlayers = new HashSet<>();
@@ -42,6 +41,13 @@ public class ServerProtectionState {
 	public static void onServerStarted(ServerStartedEvent event) {
 		serverInstance = event.getServer();
 	}
+
+    @SubscribeEvent
+    public static void onPlayerLeft(PlayerEvent.PlayerLoggedOutEvent event) {
+        UUID uuid = event.getEntity().getUUID();
+        lastPingTime.remove(uuid);
+        protectedPlayers.remove(uuid);
+    }
 
 
     @SubscribeEvent
