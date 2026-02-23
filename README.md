@@ -13,10 +13,6 @@
 
 -   **This mod protects you from all sources of damage when your computer experiences frame drops — from small stutters lasting 0.25 seconds to severe, continuous freezes — by monitoring the game's FPS.**
 
--   **While playing a self-made modpack with friends, I encountered frustrating performance issues. After searching extensively, I realized there wasn’t any Forge mod that could protect players during lag spikes. That why I decided to make one myself.**
-
--   **I had to work painfully with Notepad++ and manually run the mod through CMD instead of using any IDE that supports Minecraft modding, all because of my potato pc. So please download it. 😭😭**
-
 -   **Requires installation on both server and client.**
 
 -   **Please let me know if you encounter any unexpected bugs or issues.**
