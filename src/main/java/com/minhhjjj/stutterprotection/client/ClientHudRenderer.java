@@ -1,4 +1,4 @@
-package com.example.lagprotection.client;
+package com.minhhjjj.stutterprotection.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -6,30 +6,32 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import com.example.lagprotection.config.LagConfig;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 
 import java.awt.*;
 
+import com.minhhjjj.stutterprotection.config.LagConfig;
+
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ClientHudRenderer {
     private static boolean isLagging = false;
-    private static int currentFps = 0;
     private static int mcFps = 0;
-    private static int avgFps = 0;
-    private static int lvl = 1;
-    private static long debug;
+    // private static int currentFps = 0;
+    // private static int avgFps = 0;
+    // private static int lvl = 1;
+    // private static long debug;
 
     public static void updateLagStatus(boolean isLagging, int currentFps, int mcFps, int avgFps, int lvl, long debug) {
         ClientHudRenderer.isLagging = isLagging;
-        ClientHudRenderer.currentFps = currentFps;
         ClientHudRenderer.mcFps = mcFps;
-        ClientHudRenderer.avgFps = avgFps;
-        ClientHudRenderer.lvl = lvl;
-        ClientHudRenderer.debug = debug;
+        // ClientHudRenderer.currentFps = currentFps;
+        // ClientHudRenderer.avgFps = avgFps;
+        // ClientHudRenderer.lvl = lvl;
+        // ClientHudRenderer.debug = debug;
     }
 
+    @SuppressWarnings("null")
     @SubscribeEvent
     public static void onRenderOverlay(RenderGuiOverlayEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();

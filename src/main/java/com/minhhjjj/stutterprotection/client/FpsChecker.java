@@ -1,8 +1,5 @@
-package com.example.lagprotection.client;
+package com.minhhjjj.stutterprotection.client;
 
-import com.example.lagprotection.config.LagConfig;
-import com.example.lagprotection.network.LagStatusPacket;
-import com.example.lagprotection.network.PacketHandle;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent.RenderTickEvent;
@@ -10,6 +7,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.Queue;
+
+import com.minhhjjj.stutterprotection.network.LagStatusPacket;
+import com.minhhjjj.stutterprotection.network.PacketHandle;
+
 import java.util.ArrayDeque;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT)

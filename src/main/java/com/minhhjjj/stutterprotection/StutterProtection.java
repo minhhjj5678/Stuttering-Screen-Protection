@@ -1,7 +1,8 @@
-package com.example.lagprotection;
+package com.minhhjjj.stutterprotection;
 
-import com.example.lagprotection.config.LagConfig;
-import com.example.lagprotection.network.PacketHandle;
+import com.minhhjjj.stutterprotection.config.LagConfig;
+import com.minhhjjj.stutterprotection.network.PacketHandle;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -10,11 +11,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod("lagprotection")
-public class LagProtectionMod {
-    public static final String MODID = "lagprotection";
+@Mod("stutterprotection")
+public class StutterProtection {
+    public static final String MODID = "stutterprotection";
 
-    public LagProtectionMod() {
+    @SuppressWarnings("removal")
+    public StutterProtection() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onCommonSetup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
 

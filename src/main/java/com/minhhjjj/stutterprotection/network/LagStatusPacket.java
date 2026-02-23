@@ -1,11 +1,12 @@
-package com.example.lagprotection.network;
+package com.minhhjjj.stutterprotection.network;
 
-import com.example.lagprotection.ServerProtectionState;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
+
+import com.minhhjjj.stutterprotection.ServerProtectionState;
 
 public class LagStatusPacket {
 

@@ -1,4 +1,4 @@
-package com.example.lagprotection.config;
+package com.minhhjjj.stutterprotection.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
