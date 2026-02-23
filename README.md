@@ -20,12 +20,7 @@
 -   **Requires installation on both server and client.**
 
 -   **Please let me know if you encounter any unexpected bugs or issues.**
-- --
 
-# **🎥 Video**
-
--   **The video below only demonstrates the mod's ability to protect players from all damage sources. As of version 2.0.0, the option to manually adjust the lag threshold has been removed from the config (see the Config section below).**
-<video src="https://youtu.be/3zWfsjAa9Yc" controls="controls" width="100%"> </video>
 ---
 
 # **🔧 Configuration**
