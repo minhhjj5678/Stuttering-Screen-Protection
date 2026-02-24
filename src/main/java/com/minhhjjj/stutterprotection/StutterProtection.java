@@ -15,7 +15,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public class StutterProtection {
     public static final String MODID = "stutterprotection";
 
-    @SuppressWarnings("removal")
     public StutterProtection() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onCommonSetup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);

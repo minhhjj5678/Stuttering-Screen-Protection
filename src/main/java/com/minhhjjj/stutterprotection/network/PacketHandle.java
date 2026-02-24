@@ -8,7 +8,6 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class PacketHandle {
     private static final String PROTOCOL_VERSION = "1.0";
-    @SuppressWarnings("removal")
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(StutterProtection.MODID, "main"),
             () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals

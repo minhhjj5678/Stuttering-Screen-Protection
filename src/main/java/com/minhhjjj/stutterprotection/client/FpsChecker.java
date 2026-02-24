@@ -58,9 +58,20 @@ public class FpsChecker {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
 
-        int mcFps = mc.getFps();
+        int mcFps = 0;
+        try {
+            String rawFpsString = mc.fpsString;
+            
+            if (rawFpsString != null && !rawFpsString.isEmpty()) {
+                mcFps = Integer.parseInt(rawFpsString.split(" ")[0]);
+            } else {
+                mcFps = instantFps;
+            }
+        } catch (Exception e) {
+            mcFps = instantFps; 
+        }
         int fps = instantFps;
-        int maxFps = mc.options.framerateLimit().get();
+        int maxFps = mc.options.framerateLimit;
 
         boolean isLowFps = fps <= FPS_THRESGOLD;
         boolean isInstantDrop, isLagging1;

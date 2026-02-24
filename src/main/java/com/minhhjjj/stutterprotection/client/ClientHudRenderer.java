@@ -1,17 +1,16 @@
 package com.minhhjjj.stutterprotection.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 
 import java.awt.*;
 
 import com.minhhjjj.stutterprotection.config.LagConfig;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ClientHudRenderer {
@@ -33,15 +32,15 @@ public class ClientHudRenderer {
 
     @SuppressWarnings("null")
     @SubscribeEvent
-    public static void onRenderOverlay(RenderGuiOverlayEvent.Post event) {
+    public static void onRenderOverlay(RenderGameOverlayEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
         if (mc.screen instanceof ChatScreen) return;
         if (mc.options.hideGui) return;
         if (!LagConfig.SHOW_HUD.get()) return;
-        if (event.getOverlay() != VanillaGuiOverlay.HOTBAR.type()) return;
+        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
 
-        GuiGraphics guiGraphics = event.getGuiGraphics();
+        PoseStack poseStack = event.getMatrixStack();
         String text = "FPS: " + mcFps;
         int color = isLagging ? Color.GREEN.getRGB() : Color.WHITE.getRGB();
 
@@ -65,6 +64,6 @@ public class ClientHudRenderer {
         guiGraphics.drawString(mc.font, sttText, sttX, sttY, color);
         guiGraphics.drawString(mc.font, dbText, dbX, dbY, color);
         */
-        guiGraphics.drawString(mc.font, text, x, y, color);
+        mc.font.drawShadow(poseStack, text, x, y, color);
     }
 }

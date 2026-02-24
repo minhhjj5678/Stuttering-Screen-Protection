@@ -45,7 +45,7 @@ public class ServerProtectionState {
 
     @SubscribeEvent
     public static void onPlayerLeft(PlayerEvent.PlayerLoggedOutEvent event) {
-        Player player = event.getEntity();
+        Player player = event.getPlayer();
         lastPingTime.remove(player.getUUID());
         protectedPlayers.remove(player.getUUID());
     }

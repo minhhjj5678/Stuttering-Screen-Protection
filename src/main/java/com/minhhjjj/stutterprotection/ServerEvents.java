@@ -20,10 +20,10 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onLivingHurt(LivingHurtEvent event) {
-        if (!isProtected(event.getEntity())) return;
+        if (!isProtected(event.getEntityLiving())) return;
 
         String sourceId = event.getSource().getMsgId();
-        LivingEntity entity = event.getEntity();
+        LivingEntity entity = event.getEntityLiving();
 
         if ("drown".equals(sourceId) && entity instanceof Player player) {
             player.setAirSupply(player.getMaxAirSupply());
@@ -43,15 +43,15 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onLivingAttack(LivingAttackEvent event) {
-        if (!isProtected(event.getEntity())) return;
+        if (!isProtected(event.getEntityLiving())) return;
         event.setCanceled(true);
     }
 
     @SubscribeEvent
     public static void onLivingDamage(LivingDamageEvent event) {
-        if (!isProtected(event.getEntity())) return;
+        if (!isProtected(event.getEntityLiving())) return;
 
-        LivingEntity entity = event.getEntity();
+        LivingEntity entity = event.getEntityLiving();
 
         if (entity instanceof Player player) {
             player.clearFire();
