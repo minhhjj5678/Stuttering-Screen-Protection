@@ -12,10 +12,6 @@ out
 *.iws
 *.iml
 .idea
-.settings/
-.classpath
-.project
-.vscode/
 
 # gradle
 build
@@ -24,10 +20,6 @@ build
 # other
 eclipse
 run
-logs/
-crash-reports/
-.DS_Store
-Thumbs.db
 
 # Files from Forge MDK
 forge*changelog.txt
