@@ -5,12 +5,12 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screen.ChatScreen;
 
 import java.awt.*;
 
 import com.minhhjjj.stutterprotection.config.LagConfig;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ClientHudRenderer {
@@ -38,9 +38,9 @@ public class ClientHudRenderer {
         if (mc.screen instanceof ChatScreen) return;
         if (mc.options.hideGui) return;
         if (!LagConfig.SHOW_HUD.get()) return;
-        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
+        if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT) return;
 
-        PoseStack poseStack = event.getMatrixStack();
+        MatrixStack matrixStack = event.getMatrixStack();
         String text = "FPS: " + mcFps;
         int color = isLagging ? Color.GREEN.getRGB() : Color.WHITE.getRGB();
 
@@ -64,6 +64,6 @@ public class ClientHudRenderer {
         guiGraphics.drawString(mc.font, sttText, sttX, sttY, color);
         guiGraphics.drawString(mc.font, dbText, dbX, dbY, color);
         */
-        mc.font.drawShadow(poseStack, text, x, y, color);
+        mc.font.drawShadow(matrixStack, text, x, y, color);
     }
 }

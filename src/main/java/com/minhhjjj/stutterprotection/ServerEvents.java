@@ -1,9 +1,9 @@
 package com.minhhjjj.stutterprotection;
 
-import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.play.server.SUpdateHealthPacket;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -14,7 +14,8 @@ import net.minecraftforge.fml.common.Mod;
 public class ServerEvents {
 
     private static boolean isProtected(LivingEntity entity) {
-        if (!(entity instanceof ServerPlayer player)) return false;
+        if (!(entity instanceof ServerPlayerEntity)) return false;
+        ServerPlayerEntity player = (ServerPlayerEntity) entity;
         return ServerProtectionState.isProtected(player);
     }
 
@@ -25,12 +26,14 @@ public class ServerEvents {
         String sourceId = event.getSource().getMsgId();
         LivingEntity entity = event.getEntityLiving();
 
-        if ("drown".equals(sourceId) && entity instanceof Player player) {
+        if ("drown".equals(sourceId) && entity instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) entity;
             player.setAirSupply(player.getMaxAirSupply());
         }
 
-        if (entity instanceof ServerPlayer serverPlayer) {
-            serverPlayer.connection.send(new ClientboundSetHealthPacket(
+        if (entity instanceof ServerPlayerEntity) {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) entity;
+            serverPlayer.connection.send(new SUpdateHealthPacket(
                     serverPlayer.getHealth(),
                     serverPlayer.getFoodData().getFoodLevel(),
                     serverPlayer.getFoodData().getSaturationLevel()
@@ -53,7 +56,8 @@ public class ServerEvents {
 
         LivingEntity entity = event.getEntityLiving();
 
-        if (entity instanceof Player player) {
+        if (entity instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) entity;
             player.clearFire();
             // player.setDeltaMovement(0, 0, 0);
             player.fallDistance = 0;

@@ -1,13 +1,13 @@
 package com.minhhjjj.stutterprotection;
 
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,11 +21,11 @@ public class ServerProtectionState {
 
     private static final long TIMEOUT_MS = 300;
 
-    public static void onPingReceived(ServerPlayer player) {
+    public static void onPingReceived(ServerPlayerEntity player) {
         lastPingTime.put(player.getUUID(), System.currentTimeMillis());
     }
 
-    public static boolean isProtected(ServerPlayer player) {
+    public static boolean isProtected(ServerPlayerEntity player) {
         return protectedPlayers.contains(player.getUUID());
     }
 
@@ -39,13 +39,13 @@ public class ServerProtectionState {
     }
 
     @SubscribeEvent
-    public static void onServerStarted(ServerStartedEvent event) {
+    public static void onServerStarted(FMLServerStartedEvent event) {
         serverInstance = event.getServer();
     }
 
     @SubscribeEvent
     public static void onPlayerLeft(PlayerEvent.PlayerLoggedOutEvent event) {
-        Player player = event.getPlayer();
+        PlayerEntity player = event.getPlayer();
         lastPingTime.remove(player.getUUID());
         protectedPlayers.remove(player.getUUID());
     }
@@ -57,7 +57,7 @@ public class ServerProtectionState {
 
         long now = System.currentTimeMillis();
 
-        for (ServerPlayer player : serverInstance.getPlayerList().getPlayers()) {
+        for (ServerPlayerEntity player : serverInstance.getPlayerList().getPlayers()) {
             UUID uuid = player.getUUID();
             Long lastPing = lastPingTime.get(uuid);
 
