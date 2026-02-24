@@ -1,4 +1,4 @@
-package com.example.lagprotection;
+package com.minhhjjj.stutterprotection;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,16 +10,15 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Mod.EventBusSubscriber(modid = "lagprotection")
+@Mod.EventBusSubscriber(modid = "stutterprotection")
 public class ServerProtectionState {
 
     private static final Set<UUID> protectedPlayers = new HashSet<>();
     private static final Map<UUID, Long> lastPingTime = new ConcurrentHashMap<>();
     private static MinecraftServer serverInstance = null;
 
-    private static final long TIMEOUT_MS = 250; // sau 0.25s không nhận ping thì xem là lag
+    private static final long TIMEOUT_MS = 250;
 
-    // Được gọi khi nhận packet từ client (LagStatusPacket)
     public static void onPingReceived(ServerPlayer player) {
         lastPingTime.put(player.getUUID(), System.currentTimeMillis());
     }
