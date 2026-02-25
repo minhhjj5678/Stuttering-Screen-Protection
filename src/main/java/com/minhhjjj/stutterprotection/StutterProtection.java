@@ -22,7 +22,7 @@ public class StutterProtection {
     @SuppressWarnings("null")
     private void registerGuiLayers(RegisterGuiLayersEvent event) {
         event.registerAboveAll(
-            net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(MODID, "fps_hud"), 
+            net.minecraft.resources.Identifier.fromNamespaceAndPath(MODID, "fps_hud"), 
             ClientHudRenderer::render 
         );
     }
