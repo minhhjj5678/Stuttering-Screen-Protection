@@ -7,11 +7,11 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-
+import com.minhhjjj.stutterprotection.StutterProtection;
 
 public class LagStatusPacket implements CustomPacketPayload {
     @SuppressWarnings("null")
-    public static final CustomPacketPayload.Type<LagStatusPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("stutterprotection","payload"));
+    public static final CustomPacketPayload.Type<LagStatusPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StutterProtection.MODID,"payload"));
 	public static final LagStatusPacket PACKET = new LagStatusPacket();
 
     public LagStatusPacket() {}
