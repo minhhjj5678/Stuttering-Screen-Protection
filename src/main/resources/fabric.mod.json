@@ -3,15 +3,15 @@
 	"id": "stutterprotection",
 	"version": "${version}",
 	"name": "StutterProtection",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Protecting players when they suffer fps drops.",
 	"authors": [
-		"Me!"
+		"minhhjjj"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://github.com/minhhjj5678",
+		"sources": "https://github.com/minhhjj5678/Stuttering-Screen-Protection"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/stutterprotection/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -31,7 +31,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.18.4",
-		"minecraft": "~1.21.1",
+		"minecraft": ">=1.21.1 <=1.21.11",
 		"java": ">=21",
 		"fabric-api": "*"
 	}
