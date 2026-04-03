@@ -1,0 +1,13 @@
+{
+  "itemGroup.stutterprotection": "Example Mod Tab",
+  "block.stutterprotection.example_block": "Example Block",
+  "item.stutterprotection.example_item": "Example Item",
+
+  "stutterprotection.configuration.title": "Stutter Protection Configs",
+  "stutterprotection.configuration.section.stutterprotection.common.toml": "Stutter Protection Configs",
+  "stutterprotection.configuration.section.stutterprotection.common.toml.title": "Stutter Protection Configs",
+  "stutterprotection.configuration.items": "Item List",
+  "stutterprotection.configuration.logDirtBlock": "Log Dirt Block",
+  "stutterprotection.configuration.magicNumberIntroduction": "Magic Number Text",
+  "stutterprotection.configuration.magicNumber": "Magic Number"
+}
