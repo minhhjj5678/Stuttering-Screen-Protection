@@ -1,7 +1,7 @@
 
 # 🛡️ Stuttering Screen Protection
 
-![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-green?style=flat-square)
+![Minecraft](https://img.shields.io/badge/Minecraft-26.1.1-green?style=flat-square)
 ![Fabric](https://img.shields.io/badge/Fabric-0.18.x-red?style=flat-square)
 ![Version](https://img.shields.io/badge/Version-3.0.0-orange?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
