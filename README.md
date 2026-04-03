@@ -1,25 +1,33 @@
 
-Installation information
-=======
+# 🛡️ Stuttering Screen Protection
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+![Minecraft](https://img.shields.io/badge/Minecraft-26.1.1-green?style=flat-square)
+![Forge](https://img.shields.io/badge/NeoForge-26.1.x-red?style=flat-square)
+![Version](https://img.shields.io/badge/Version-3.0.0-orange?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+---
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+# **What does this mod do?**
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+-   **This mod protects you from all sources of damage when your computer experiences frame drops — from small stutters lasting 0.25 seconds to severe, continuous freezes — by monitoring the game's FPS.**
+
+-   **Requires installation on both server and client.**
+
+-   **Please let me know if you encounter any unexpected bugs or issues.**
+
+---
+
+# **🔧 Configuration**
+
+~~(_You’ll need to install the Cloth Config mod to access the configuration menu_)- Use the command /lagprotection-config to open the config menu, or if you don't have Cloth Config installed, manually edit the configuration file. Changing the config only affects the client side, so modifying it in the server folder will have no effect.- By default, the protection activates when your FPS drops to 10 or below, and remains active for 5 more seconds after your FPS returns to normal.~~
+
+-   **Starting from version 2.0.0, the Cloth Config API mod is no longer required for configuration. You can simply use the command `/stutterprotection-hud true/false` (default is true) to toggle the FPS display.**
+- --
+
+# **🔓 Permissions**
+
+-   **Feel free to use this mod and include it in your own modpacks if you'd like.**
+---
+_Found a bug? Please report it in the Issues tab!_
