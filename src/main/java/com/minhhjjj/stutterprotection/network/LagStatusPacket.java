@@ -6,12 +6,12 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class LagStatusPacket implements CustomPacketPayload {
     
     public static final CustomPacketPayload.Type<LagStatusPacket> TYPE = 
-            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StutterProtection.MODID, "payload"));
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(StutterProtection.MODID, "payload"));
     
     public static final LagStatusPacket PACKET = new LagStatusPacket();
 
@@ -20,7 +20,7 @@ public class LagStatusPacket implements CustomPacketPayload {
     public static final StreamCodec<RegistryFriendlyByteBuf, LagStatusPacket> STREAM_CODEC = StreamCodec.unit(PACKET);
 
     public static void register() {
-        PayloadTypeRegistry.playC2S().register(TYPE, STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(TYPE, STREAM_CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(TYPE, (payload, context) -> {
             PacketHandle.LagPacketHandleServerside(payload, context);
