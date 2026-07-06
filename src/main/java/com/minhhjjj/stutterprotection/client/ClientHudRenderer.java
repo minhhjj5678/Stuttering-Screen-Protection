@@ -30,8 +30,8 @@ public class ClientHudRenderer {
 
         if (!LagConfig.SHOW_HUD.get()) return;
         if (mc.player == null || mc.level == null) return;
-        if (mc.options.hideGui) return;
-        if (mc.screen instanceof ChatScreen) return;
+        if (mc.gui.hud.isHidden()) return;
+        if (mc.gui.screen() instanceof ChatScreen) return;
         
         String mcText = "FPS: " + mcFps;
         int color = isLagging ? Color.GREEN.getRGB() : Color.WHITE.getRGB();
